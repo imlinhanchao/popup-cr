@@ -1,0 +1,16 @@
+{
+  "name": "popup-cr",
+  "version": "1.0.0",
+  "description": "A popup UI component for Tampermonkey scripts, built with SeraJS and Parcel",
+  "scripts": {
+    "dev": "parcel watch src/index.jsx --no-hmr",
+    "build": "parcel build src/index.jsx --no-scope-hoist && node scripts/pack.mjs",
+    "build:raw": "parcel build src/index.jsx --no-scope-hoist"
+  },
+  "dependencies": {
+    "serajs": "^1.0.7"
+  },
+  "devDependencies": {
+    "parcel": "^2.13.3"
+  }
+}
