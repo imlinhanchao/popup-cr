@@ -1,6 +1,6 @@
 /** @jsx h */
 /** @jsxFrag Fragment */
-import { h, createSignal, Fragment } from 'serajs';
+import { h, Fragment, createSignal } from 'serajs';
 import { injectStyles } from './styles.js';
 
 /**
@@ -25,30 +25,33 @@ function PopupCR({ title = 'Code Review', onClose } = {}) {
     setText('');
   }
 
-  const wrapper = h('div', { class: 'popup-cr-wrapper' },
-    () => visible()
-      ? h('div', { class: 'popup-cr' },
-          h('div', { class: 'popup-cr-header' },
-            h('span', { class: 'popup-cr-title' }, title),
-            h('button', { class: 'popup-cr-close', onclick: handleClose }, '×')
-          ),
-          h('div', { class: 'popup-cr-body' },
-            h('textarea', {
-              class: 'popup-cr-textarea',
-              placeholder: 'Enter your review comment...',
-              oninput: (e) => setText(e.target.value),
-              value: text()
-            }),
-            h('div', { class: 'popup-cr-actions' },
-              h('button', { class: 'popup-cr-btn popup-cr-btn-submit', onclick: handleSubmit }, 'Submit'),
-              h('button', { class: 'popup-cr-btn popup-cr-btn-cancel', onclick: handleClose }, 'Cancel')
-            )
-          )
+  return (
+    <div class="popup-cr-wrapper">
+      {() => visible()
+        ? (
+          <div class="popup-cr">
+            <div class="popup-cr-header">
+              <span class="popup-cr-title">{title}</span>
+              <button class="popup-cr-close" onclick={handleClose}>×</button>
+            </div>
+            <div class="popup-cr-body">
+              <textarea
+                class="popup-cr-textarea"
+                placeholder="Enter your review comment..."
+                oninput={(e) => setText(e.target.value)}
+                value={text()}
+              />
+              <div class="popup-cr-actions">
+                <button class="popup-cr-btn popup-cr-btn-submit" onclick={handleSubmit}>Submit</button>
+                <button class="popup-cr-btn popup-cr-btn-cancel" onclick={handleClose}>Cancel</button>
+              </div>
+            </div>
+          </div>
         )
-      : null
+        : null
+      }
+    </div>
   );
-
-  return wrapper;
 }
 
 /**
