@@ -1,9 +1,7 @@
-import { mount, PopupCR } from './src/index';
+import { activate } from './module';
+import type { FishPi } from 'fishpi';
 
-// Auto-mount the popup when the script loads
-mount(document.body);
-
-// Expose API for external use (e.g., Tampermonkey scripts)
-if (typeof window !== 'undefined') {
-  (window as any).popupCR = { mount, PopupCR };
+declare global {
+  const fishpi: FishPi;
 }
+activate(window, document, fishpi);

@@ -1,16 +1,18 @@
 {
   "name": "popup-cr",
   "version": "1.0.0",
-  "description": "A popup UI component for Tampermonkey scripts, built with SeraJS and tsdown",
+  "description": "A popup UI component for Tampermonkey scripts, built with Alpine.js and tsdown",
   "scripts": {
     "dev": "tsdown --watch",
     "build": "tsdown && node scripts/pack.mjs",
     "build:raw": "tsdown"
   },
   "dependencies": {
-    "serajs": "^1.0.7"
+    "alpinejs": "^3.12.3"
   },
   "devDependencies": {
+    "@types/alpinejs": "^3.13.11",
+    "fishpi": "^0.1.26",
     "tsdown": "^0.21.0-beta.2",
     "typescript": "^5.9.3"
   },

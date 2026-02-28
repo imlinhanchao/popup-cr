@@ -1,10 +1,10 @@
 # popup-cr
 
-A lightweight popup UI component for [Tampermonkey](https://www.tampermonkey.net/) userscripts, built with [SeraJS](https://www.npmjs.com/package/serajs) and [Parcel](https://parceljs.org/).
+A lightweight popup UI component for [Tampermonkey](https://www.tampermonkey.net/) userscripts, built with [Alpine.js](https://alpinejs.dev/) and [tsdown](https://github.com/tsdown/tsdown).
 
 ## Features
 
-- ⚡ Reactive UI powered by SeraJS signals
+- ⚡ Reactive UI powered by Alpine.js
 - 📦 Bundled to a single self-contained file via Parcel
 - 🧩 Mount to any specified DOM element
 - 🎨 Clean GitHub-style design
@@ -96,5 +96,5 @@ Returns `{ unmount() }` — call `unmount()` to remove the popup from the DOM.
 
 | Tool | Role |
 |------|------|
-| [SeraJS](https://www.npmjs.com/package/serajs) | Signal-based reactive UI library |
+| [Alpine.js](https://alpinejs.dev/) | Minimal reactive UI framework |
 | [Parcel](https://parceljs.org/) | Zero-config bundler |
