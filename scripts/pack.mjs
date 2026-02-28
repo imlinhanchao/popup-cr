@@ -13,14 +13,15 @@ const root = join(__dirname, '..');
 const distDir = join(root, 'dist');
 const metaFile = join(root, 'userscript.meta.js');
 
-// Find the built JS file in dist/
+// Find the built JS file in dist/ (tsdown outputs *.iife.js)
 const files = readdirSync(distDir).filter(f => f.endsWith('.js') && !f.endsWith('.user.js'));
 if (files.length === 0) {
   console.error('No JS file found in dist/. Run `npm run build:raw` first.');
   process.exit(1);
 }
 
-const bundleFile = join(distDir, files[0]);
+// Prefer the .iife.js file produced by tsdown
+const bundleFile = join(distDir, files.find(f => f.endsWith('.iife.js')) ?? files[0]);
 const meta = readFileSync(metaFile, 'utf8').trimEnd();
 const bundle = readFileSync(bundleFile, 'utf8');
 

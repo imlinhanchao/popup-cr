@@ -1,15 +1,19 @@
-/** @jsx h */
-/** @jsxFrag Fragment */
 import { h, Fragment, createSignal } from 'serajs';
-import { injectStyles } from './styles.js';
+import { injectStyles } from './styles';
+
+export interface PopupCROptions {
+  title?: string;
+  onClose?: () => void;
+}
+
+export interface PopupCRInstance {
+  unmount: () => void;
+}
 
 /**
  * Popup component for code review.
- * @param {object} props
- * @param {string} [props.title] - Popup title
- * @param {Function} [props.onClose] - Callback when popup is closed
  */
-function PopupCR({ title = 'Code Review', onClose } = {}) {
+function PopupCR({ title = 'Code Review', onClose }: PopupCROptions = {}): Element {
   const [visible, setVisible] = createSignal(true);
   const [text, setText] = createSignal('');
 
@@ -38,7 +42,7 @@ function PopupCR({ title = 'Code Review', onClose } = {}) {
               <textarea
                 class="popup-cr-textarea"
                 placeholder="Enter your review comment..."
-                oninput={(e) => setText(e.target.value)}
+                oninput={(e: Event) => setText((e.target as HTMLTextAreaElement).value)}
                 value={text()}
               />
               <div class="popup-cr-actions">
@@ -51,18 +55,16 @@ function PopupCR({ title = 'Code Review', onClose } = {}) {
         : null
       }
     </div>
-  );
+  ) as Element;
 }
 
 /**
  * Mount the popup UI into the given container element.
- * @param {HTMLElement} container - The DOM element to render the popup into
- * @param {object} [options]
- * @param {string} [options.title] - Popup title
- * @param {Function} [options.onClose] - Callback when popup is closed
- * @returns {{ unmount: Function }} Object with unmount function
+ * @param container - The DOM element to render the popup into
+ * @param options - Optional popup configuration
+ * @returns Object with unmount function
  */
-export function mount(container, options = {}) {
+export function mount(container: HTMLElement, options: PopupCROptions = {}): PopupCRInstance {
   injectStyles();
   const el = PopupCR(options);
   container.appendChild(el);
@@ -77,8 +79,3 @@ export function mount(container, options = {}) {
 }
 
 export { PopupCR };
-
-// Expose global API for use in Tampermonkey scripts
-if (typeof window !== 'undefined') {
-  window.popupCR = { mount, PopupCR };
-}

@@ -118,7 +118,7 @@ let stylesInjected = false;
  * Inject popup styles into the document <head>.
  * Safe to call multiple times — only injects once.
  */
-export function injectStyles() {
+export function injectStyles(): void {
   if (stylesInjected) return;
   const style = document.createElement('style');
   style.textContent = CSS;
