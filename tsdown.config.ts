@@ -19,7 +19,7 @@ export default defineConfig([
     platform: 'browser',
     dts: false,
     target: 'esnext',
-    sourcemap: true,
+    sourcemap: false,
     clean: false,
     treeshake: true,
     deps: {

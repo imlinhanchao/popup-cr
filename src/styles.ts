@@ -109,7 +109,7 @@ body.popup-only #popup-cr {
   background: transparent;
   border: none;
   color: #57606a;
-  font-size: 22px;
+  font-size: 15px;
   line-height: 1;
   cursor: pointer;
   padding: 0 4px;
@@ -199,6 +199,10 @@ body.popup-only #popup-cr {
   height: auto;
   border-radius: 4px;
   margin-top: 4px;
+}
+
+.chat-message .content img[alt=图片表情] {
+  max-width: 30px;
 }
 
 .chat-message .time {
@@ -334,10 +338,22 @@ body.popup-only #popup-cr {
   font-size: 13px;
 }
 
-.coin__icon {
+.vditor-reset .coin__icon, .coin__icon {
   width: 14px;
   height: 14px;
   fill: #ffd700; /* Gold coin color fallback if inline SVG relies on fill */
+}
+
+.music-msg .music-status {
+  margin-left: 6px;
+  font-size: 12px;
+  color: #57606a;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+  
+.music-msg .music-status:hover {
+  color: #24292f;
 }
 `;
 

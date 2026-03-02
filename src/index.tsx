@@ -1,4 +1,4 @@
-import type { FishPi, IChatRoomMessage, IRedPacketMessage } from 'fishpi';
+import type { FishPi, IChatRoomMessage, IMusicMessage, IRedPacketMessage, IWeatherMessage } from 'fishpi';
 import Alpine from 'alpinejs';
 import { injectStyles } from './styles';
 
@@ -41,6 +41,24 @@ export async function mount(container: HTMLElement, fishpi: FishPi, full = false
   injectStyles();
   ensureAlpine();
 
+  document.body.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.matches('.music-status')) {
+      const musicMsgEl = target.closest('.music-msg') as HTMLElement;
+      const audio = musicMsgEl.querySelector('.music-audio') as HTMLAudioElement;
+      const statusEl = musicMsgEl.querySelector('.music-status') as HTMLElement;
+      if (audio) {
+        if (audio.paused) {
+          audio.play();
+          statusEl.textContent = '⏸';
+        } else {
+          audio.pause();
+          statusEl.textContent = '▶';
+        }
+      }
+    }
+  });
+
   // helper component for rendering individual messages
   Alpine.data('chatMessage', (msg: IChatRoomMessage) => ({
     msg,
@@ -72,6 +90,40 @@ export async function mount(container: HTMLElement, fishpi: FishPi, full = false
             </div>
           </div>
         `;
+      }
+      if (this.msg.type === 'weather') {
+        const weatherIcon = {
+          CLEAR_DAY: '☀️',
+          CLEAR_NIGHT: '🌙',
+          CLOUDY: '☁️',
+          DUST: '🤧',
+          FOG: '🌫️',
+          HEAVY_HAZE: '⛆',
+          HEAVY_RAIN: '🌧️',
+          HEAVY_SNOW: '❄️',
+          LIGHT_HAZE: '🌫️',
+          LIGHT_RAIN: '🌧️',
+          LIGHT_SNOW: '❄️',
+          MODERATE_HAZE: '⛆',
+          MODERATE_RAIN: '🌧️',
+          MODERATE_SNOW: '❄️',
+          PARTLY_CLOUDY_DAY: '⛅',
+          PARTLY_CLOUDY_NIGHT: '🌙',
+          SAND: '⛱️',
+          STORM_RAIN: '⛈️',
+          STORM_SNOW: '❄️',
+          WIND: '🍃',
+        };
+        const weatherData = this.msg.content as IWeatherMessage;
+        const content = `${weatherIcon[weatherData.data[0].code]}${weatherData.city} ${weatherData.description}`;
+        return `<div>${content}</div>`;
+      }
+      if (msg.type === 'music') {
+        const musicData = this.msg.content as IMusicMessage;
+        return `<span class="music-msg" data-music-source="${musicData.source}">
+        🎵 ${musicData.title} <span class="music-status">▶</span>
+          <audio class="music-audio" src="${musicData.source}" style="display:none;"></audio>
+        </span>`;
       }
       // default: string or fallback to JSON
       return typeof this.msg.content === 'string'
@@ -167,6 +219,16 @@ export async function mount(container: HTMLElement, fishpi: FishPi, full = false
     save() {
       const { pos, title, visible } = this;
       localStorage.setItem('popupCRSetting', JSON.stringify({ pos, title, visible }));
+    },
+    popupChat() {
+      const popup = window.open('/cr-popup', '_blank', 'width=400,height=600');
+      setTimeout(() => {
+        if (popup?.document) {
+          popup.document.addEventListener('DOMContentLoaded', () => {
+            popup.document.body.innerHTML = '';
+          });
+        }
+      }, 500);
     }
   }));
 
@@ -176,7 +238,7 @@ export async function mount(container: HTMLElement, fishpi: FishPi, full = false
     <div x-data="${componentName}" class="popup-cr-wrapper${ full ? ' fullscreen-popup' : ''}">
       <!-- Minimal bar when minimized -->
       <div x-show="!visible" class="chat-min-bar" @click="restore" x-transition>
-        <svg><use xlink:href="#idleChat"></use></svg>
+        <span>💬</span>
         <span x-text="title"></span>
       </div>
 
@@ -187,12 +249,13 @@ export async function mount(container: HTMLElement, fishpi: FishPi, full = false
            x-transition:leave="chat-transition-leave">
         <div class="chat-header" @mousedown="startDrag">
           <span class="chat-header-title">
-            <svg style="height: 1em; width: 1em; vertical-align: middle;">
-              <use xlink:href="#idleChat"></use>
-            </svg>
+            <span>💬</span>
             <span x-text="title" style="vertical-align: middle;"></span>
           </span>
-          <button class="popup-cr-close" @click="minimize" title="最小化基础">-</button>
+          <span>
+            <button class="popup-cr-close" @click="popupChat" title="弹窗">↗️</button>
+            <button class="popup-cr-close" @click="minimize" title="最小化基础">➖</button>
+          </span>
         </div>
         <div class="chat-body">
           <template x-for="msg in messages" :key="msg.oId">
@@ -209,8 +272,8 @@ export async function mount(container: HTMLElement, fishpi: FishPi, full = false
           </template>
         </div>
         <div class="chat-input-container">
-          <input type="text" x-model="newMessage" placeholder="Type a message..." @keydown.enter.prevent="sendMessage" />
-          <button @click="sendMessage">Send</button>
+          <input type="text" x-model="newMessage" placeholder="说点什么" @keydown.enter.prevent="sendMessage" />
+          <button @click="sendMessage">发送</button>
         </div>
       </div>
     </div>
