@@ -1,5 +1,6 @@
 import type {
   FishPi,
+  IBarragerMsg,
   IChatRoomMessage,
   IMusicMessage,
   IRedPacketInfo,
@@ -222,12 +223,19 @@ export async function mount(
         const content = `${weatherIcon[weatherData.data[0].code]}${weatherData.city} ${weatherData.description}`;
         return `<div>${content}</div>`;
       }
-      if (msg.type === "music") {
+      if (this.msg.type === "music") {
         const musicData = this.msg.content as IMusicMessage;
         return `<span class="music-msg" data-music-source="${musicData.source}">
         🎵 ${musicData.title} <span class="music-status">▶</span>
           <audio class="music-audio" src="${musicData.source}" style="display:none;"></audio>
         </span>`;
+      }
+      if (this.msg.type === "custom") {
+        return `<div class="custom-msg">${this.msg.content}</div>`;
+      }
+      if (this.msg.type === "barrager") {
+        const content = this.msg.content as any as IBarragerMsg;
+        return `<div class="barrager-msg" style="color:${content.barragerColor}">${content.barragerContent}</div>`;
       }
       // default: string or fallback to JSON
       return typeof this.msg.content === "string"
@@ -273,10 +281,26 @@ export async function mount(
         fishpi.chatroom.addListener("all", (type: string, msg: any) => {
           switch (type) {
             case "custom":
+              this.messages.push({
+                oId: "custom-" + Date.now(),
+                type,
+                userName: '',
+                content: msg,
+              });
               break;
             case "barrager":
+              this.messages.push({
+                oId: "barrager-" + Date.now(),
+                type,
+                userName: msg.userName,
+                userNickname: msg.userNickname,
+                userAvatarURL: msg.userAvatarURL,
+                content: msg,
+              });
               break;
             case "revoke":
+              const index = this.messages.findIndex((m: IChatRoomMessage) => m.oId === msg);
+              if (index >= 0) this.messages.splice(index, 1);
               break;
             case "redPacketStatus":
               break;
@@ -385,20 +409,25 @@ export async function mount(
         <div class="chat-body">
           <template x-for="msg in messages" :key="msg.oId">
             <!-- each message uses chatMessage component -->
-            <div x-data="chatMessage(msg)" class="chat-message"
+            <div x-data="chatMessage(msg)">
+              <section x-show="msg.userName" class="chat-message"
+                 :class="{ 'is-me': isMe }"
                  @mouseenter="hover=true" @mouseleave="hover=false">
-              <img class="avatar" :src="msg.userAvatarURL" />
-              <div class="chat-message-main">
-                <span class="nickname" x-text="displayName"></span>
-                <div class="content-wrapper">
-                  <span x-ref="content" class="content vditor-reset ft__smaller" 
-                        :class="{ 'expanded': expanded || msg.type === 'redPacket' }"
-                        x-html="displayContent"></span>
-                  <button class="expand-btn" x-show="showExpandBtn" 
-                          @click="toggle" x-text="expanded ? '收起' : '展开'"></button>
+                <img class="avatar" :src="msg.userAvatarURL" />
+                <div class="chat-message-main">
+                  <span class="nickname" x-text="displayName"></span>
+                  <div class="content-wrapper">
+                    <span x-ref="content" class="content vditor-reset ft__smaller" 
+                          :class="{ 'expanded': expanded || msg.type === 'redPacket' }"
+                          x-html="displayContent"></span>
+                    <button class="expand-btn" x-show="showExpandBtn" 
+                            @click="toggle" x-text="expanded ? '收起' : '展开'"></button>
+                  </div>
                 </div>
-              </div>
-              <div class="time" x-show="hover" x-transition.opacity.duration.200ms x-text="msg.time"></div>
+                <div class="time" x-show="hover" x-transition.opacity.duration.200ms x-text="msg.time"></div>
+              </section>
+              <section x-show="!msg.userName" x-html="displayContent" class="system-msg-wrapper">
+              </section>
             </div>
           </template>
         </div>
