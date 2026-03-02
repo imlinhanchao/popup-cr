@@ -334,6 +334,127 @@ body.popup-only #popup-cr {
   box-shadow: 0 4px 12px rgba(221, 40, 40, 0.3);
 }
 
+.red-packet-detail-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    max-height: 80vh;
+    background: #dd2828;
+    color: #fff;
+    border-radius: 12px;
+    z-index: 1000000;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.red-packet-detail-header {
+    background: #f78989;
+    padding: 20px 16px;
+    text-align: center;
+    position: relative;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.red-packet-detail-header .close-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.red-packet-detail-user {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.red-packet-detail-user img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+}
+
+.red-packet-detail-msg {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.red-packet-detail-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fee3aa;
+    text-align: center;
+    margin: 16px 0;
+}
+
+.red-packet-detail-list {
+    flex: 1;
+    overflow-y: auto;
+    background: #fff;
+    color: #333;
+    padding: 12px;
+}
+
+.red-packet-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.red-packet-list-item:last-child {
+    border-bottom: none;
+}
+
+.red-packet-list-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.red-packet-list-user img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+
+.red-packet-list-info {
+    text-align: right;
+}
+
+.red-packet-list-money {
+    font-weight: bold;
+    color: #dd2828;
+}
+
+.red-packet-list-time {
+    font-size: 12px;
+    color: #999;
+}
+
+.red-packet-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999999;
+}
+
 .rps-gestures {
   position: absolute;
   right: -40px;

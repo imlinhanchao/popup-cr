@@ -2,6 +2,7 @@ import type {
   FishPi,
   IChatRoomMessage,
   IMusicMessage,
+  IRedPacketInfo,
   IRedPacketMessage,
   IWeatherMessage,
 } from "fishpi";
@@ -91,8 +92,61 @@ export async function mount(
       this.expanded = !this.expanded;
     },
     openRedPacket(gesture: number) {
-      fishpi.chatroom.redpacket.open(this.msg.oId, gesture).then(() => {
-        // success
+      fishpi.chatroom.redpacket.open(this.msg.oId, gesture).then((res: IRedPacketInfo) => {
+        // Redpacket info is in res
+        const { info, who } = res;
+        const currentUserName = (window as any).fishpi?.userName || ""; // Fallback if info is not available
+        
+        // Calculate title like in redpacket.vue
+        const myResult = who.find((w: any) => w.userName === info.userName); // info.userName is current user in fishpi-desktop context? No, it's sender.
+        // Let's use simpler logic for title
+        let redpacketTitle = "";
+        const me = who.find((w: any) => w.userName === (window as any).currentUserName); // We need the current user name
+        
+        // Let's use info from the mount function scope if possible
+        const modal = document.createElement("div");
+        modal.className = "red-packet-modal-overlay";
+        
+        const listItems = who.map((w: any) => `
+          <div class="red-packet-list-item">
+            <div class="red-packet-list-user">
+              <img src="${w.avatar}" />
+              <span>${w.userName}</span>
+            </div>
+            <div class="red-packet-list-info">
+              <div class="red-packet-list-money">${w.userMoney} 积分</div>
+              <div class="red-packet-list-time">${w.time}</div>
+            </div>
+          </div>
+        `).join("");
+
+        modal.innerHTML = `
+          <div class="red-packet-detail-modal">
+            <div class="red-packet-detail-header">
+              <button class="close-btn">&times;</button>
+              <div class="red-packet-detail-user">
+                <img src="${info.userAvatarURL}" />
+                <span>${info.userName} 的红包</span>
+              </div>
+              <div class="red-packet-detail-msg">${info.msg}</div>
+            </div>
+            <div class="red-packet-detail-list">
+              ${listItems}
+            </div>
+          </div>
+        `;
+        
+        modal.querySelector(".close-btn")?.addEventListener("click", () => {
+          document.body.removeChild(modal);
+        });
+        
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal) {
+            document.body.removeChild(modal);
+          }
+        });
+
+        document.body.appendChild(modal);
       });
     },
     get displayName() {
@@ -121,7 +175,7 @@ export async function mount(
         ` : "";
         // build simple HTML snippet layout
         return `
-          <div class="redpacket-msg">
+          <div class="redpacket-msg" @click.stop="openRedPacket()">
             ${gestures}
             <div class="redpacket-top">
               <div class="redpacket-icon-wrapper">
