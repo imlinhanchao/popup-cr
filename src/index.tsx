@@ -1,6 +1,12 @@
-import type { FishPi, IChatRoomMessage, IMusicMessage, IRedPacketMessage, IWeatherMessage } from 'fishpi';
-import Alpine from 'alpinejs';
-import { injectStyles } from './styles';
+import type {
+  FishPi,
+  IChatRoomMessage,
+  IMusicMessage,
+  IRedPacketMessage,
+  IWeatherMessage,
+} from "fishpi";
+import Alpine from "alpinejs";
+import { injectStyles } from "./styles";
 
 export interface PopupCROptions {
   title?: string;
@@ -22,60 +28,104 @@ function ensureAlpine(): void {
 }
 
 const redpacketType = {
-    random: '拼手气红包',
-    average: '普通红包',
-    specify: '专属红包',
-    heartbeat: '心跳红包',
-    rockPaperScissors: '猜拳红包',
-}
+  random: "拼手气红包",
+  average: "普通红包",
+  specify: "专属红包",
+  heartbeat: "心跳红包",
+  rockPaperScissors: "猜拳红包",
+};
 
 /**
  * Mount the popup UI into the given container element.
  * Alpine handles the rendering and interactivity.
  */
-export async function mount(container: HTMLElement, fishpi: FishPi, full = false) {
-  if (document.getElementById('popup-cr')) {
-    console.warn('PopupCR is already mounted');
+export async function mount(
+  container: HTMLElement,
+  fishpi: FishPi,
+  full = false,
+) {
+  if (document.getElementById("popup-cr")) {
+    console.warn("PopupCR is already mounted");
     return { unmount() {} };
   }
+  const info = await fishpi.account.info();
   injectStyles();
   ensureAlpine();
 
-  document.body.addEventListener('click', (e) => {
+  document.body.addEventListener("click", (e) => {
     const target = e.target as HTMLElement;
-    if (target.matches('.music-status')) {
-      const musicMsgEl = target.closest('.music-msg') as HTMLElement;
-      const audio = musicMsgEl.querySelector('.music-audio') as HTMLAudioElement;
-      const statusEl = musicMsgEl.querySelector('.music-status') as HTMLElement;
+    if (target.matches(".music-status")) {
+      const musicMsgEl = target.closest(".music-msg") as HTMLElement;
+      const audio = musicMsgEl.querySelector(
+        ".music-audio",
+      ) as HTMLAudioElement;
+      const statusEl = musicMsgEl.querySelector(".music-status") as HTMLElement;
       if (audio) {
         if (audio.paused) {
           audio.play();
-          statusEl.textContent = '⏸';
+          statusEl.textContent = "⏸";
         } else {
           audio.pause();
-          statusEl.textContent = '▶';
+          statusEl.textContent = "▶";
         }
       }
     }
   });
 
   // helper component for rendering individual messages
-  Alpine.data('chatMessage', (msg: IChatRoomMessage) => ({
+  Alpine.data("chatMessage", (msg: IChatRoomMessage) => ({
     msg,
     hover: false,
+    expanded: false,
+    showExpandBtn: false,
+    init() {
+      this.$nextTick(() => {
+        if (this.msg.type === "redPacket") return;
+        const contentEl = this.$refs.content as HTMLElement;
+        if (contentEl && contentEl.scrollHeight > contentEl.clientHeight) {
+          this.showExpandBtn = true;
+        }
+      });
+    },
+    toggle() {
+      this.expanded = !this.expanded;
+    },
+    openRedPacket(gesture: number) {
+      fishpi.chatroom.redpacket.open(this.msg.oId, gesture).then(() => {
+        // success
+      });
+    },
     get displayName() {
       return this.msg.userNickname || this.msg.userName;
     },
+    get isMe() {
+      return this.msg.userName == info.userName;
+    },
     get displayContent() {
       // branch based on message type
-      if (this.msg.type === 'redPacket') {
+      if (this.msg.type === "redPacket") {
         const rp = this.msg.content as IRedPacketMessage;
+        const isRPS = rp.type === "rockPaperScissors";
+        const gestures = isRPS && !this.isMe ? `
+          <div class="rps-gestures">
+            <div class="rps-btn" title="石头" @click.stop="openRedPacket(0)">
+              <img src="https://fishpi.cn/images/redpacket/gesture/rock.png" />
+            </div>
+            <div class="rps-btn" title="剪刀" @click.stop="openRedPacket(1)">
+              <img src="https://fishpi.cn/images/redpacket/gesture/scissors.png" />
+            </div>
+            <div class="rps-btn" title="布" @click.stop="openRedPacket(2)">
+              <img src="https://fishpi.cn/images/redpacket/gesture/paper.png" />
+            </div>
+          </div>
+        ` : "";
         // build simple HTML snippet layout
         return `
           <div class="redpacket-msg">
+            ${gestures}
             <div class="redpacket-top">
               <div class="redpacket-icon-wrapper">
-                <svg class="ft__red hongbao__icon">
+                <svg class="ft__red hongbao-icon">
                   <use xlink:href="#redPacketIcon"></use>
                 </svg>
               </div>
@@ -91,34 +141,34 @@ export async function mount(container: HTMLElement, fishpi: FishPi, full = false
           </div>
         `;
       }
-      if (this.msg.type === 'weather') {
+      if (this.msg.type === "weather") {
         const weatherIcon = {
-          CLEAR_DAY: '☀️',
-          CLEAR_NIGHT: '🌙',
-          CLOUDY: '☁️',
-          DUST: '🤧',
-          FOG: '🌫️',
-          HEAVY_HAZE: '⛆',
-          HEAVY_RAIN: '🌧️',
-          HEAVY_SNOW: '❄️',
-          LIGHT_HAZE: '🌫️',
-          LIGHT_RAIN: '🌧️',
-          LIGHT_SNOW: '❄️',
-          MODERATE_HAZE: '⛆',
-          MODERATE_RAIN: '🌧️',
-          MODERATE_SNOW: '❄️',
-          PARTLY_CLOUDY_DAY: '⛅',
-          PARTLY_CLOUDY_NIGHT: '🌙',
-          SAND: '⛱️',
-          STORM_RAIN: '⛈️',
-          STORM_SNOW: '❄️',
-          WIND: '🍃',
+          CLEAR_DAY: "☀️",
+          CLEAR_NIGHT: "🌙",
+          CLOUDY: "☁️",
+          DUST: "🤧",
+          FOG: "🌫️",
+          HEAVY_HAZE: "⛆",
+          HEAVY_RAIN: "🌧️",
+          HEAVY_SNOW: "❄️",
+          LIGHT_HAZE: "🌫️",
+          LIGHT_RAIN: "🌧️",
+          LIGHT_SNOW: "❄️",
+          MODERATE_HAZE: "⛆",
+          MODERATE_RAIN: "🌧️",
+          MODERATE_SNOW: "❄️",
+          PARTLY_CLOUDY_DAY: "⛅",
+          PARTLY_CLOUDY_NIGHT: "🌙",
+          SAND: "⛱️",
+          STORM_RAIN: "⛈️",
+          STORM_SNOW: "❄️",
+          WIND: "🍃",
         };
         const weatherData = this.msg.content as IWeatherMessage;
         const content = `${weatherIcon[weatherData.data[0].code]}${weatherData.city} ${weatherData.description}`;
         return `<div>${content}</div>`;
       }
-      if (msg.type === 'music') {
+      if (msg.type === "music") {
         const musicData = this.msg.content as IMusicMessage;
         return `<span class="music-msg" data-music-source="${musicData.source}">
         🎵 ${musicData.title} <span class="music-status">▶</span>
@@ -126,55 +176,73 @@ export async function mount(container: HTMLElement, fishpi: FishPi, full = false
         </span>`;
       }
       // default: string or fallback to JSON
-      return typeof this.msg.content === 'string'
+      return typeof this.msg.content === "string"
         ? this.msg.content
         : JSON.stringify(this.msg.content);
-    }
+    },
   }));
 
-  const setting = JSON.parse(localStorage.getItem('popupCRSetting') || '{}');
+  const setting = JSON.parse(localStorage.getItem("popupCRSetting") || "{}");
   if (full) setting.visible = true; // force visible in fullscreen mode
 
   const componentName = `popupCR`;
   // define a chat component that loads history on init
   Alpine.data(componentName, () => ({
     visible: true,
-    title: '聊天室',
-    newMessage: '',
+    title: "聊天室",
+    newMessage: "",
     messages: [] as IChatRoomMessage[],
+    unreadCount: 0,
     dragging: false,
     pos: { x: 0, y: 0 },
     ...setting,
-    scrollToBottom() {
-      this.$nextTick(() => {
-        const body = this.$el.querySelector('.chat-body');
-        if (body) {
-          body.scrollTop = body.scrollHeight;
-        }
-      });
+    isAtBottom() {
+      const body = document.querySelector(".popup-cr-wrapper .chat-body");
+      if (!body) return true;
+      return body.scrollHeight - body.scrollTop - body.clientHeight < 100;
+    },
+    async scrollToBottom(wait=true) {
+      if(wait) await this.$nextTick()
+      const body = document.querySelector(".popup-cr-wrapper .chat-body");
+      if (body) {
+        body.scrollTop = body.scrollHeight;
+        this.unreadCount = 0;
+      }
     },
     async init() {
       // fetch history when the component first initializes
       try {
-        this.messages = await fishpi.chatroom.history().then(res => res.reverse());
+        this.messages = await fishpi.chatroom
+          .history()
+          .then((res) => res.reverse());
         this.scrollToBottom();
-        fishpi.chatroom.addListener('all', (type: string, msg: any) => {
+        fishpi.chatroom.addListener("all", (type: string, msg: any) => {
           switch (type) {
-            case 'custom': break;
-            case 'barrager': break;
-            case 'revoke': break;
-            case 'redPacketStatus': break;
-            case 'online': break;
-            case 'discuss': break;
-            default: 
-              this.messages.push(msg); 
-              this.scrollToBottom();
+            case "custom":
+              break;
+            case "barrager":
+              break;
+            case "revoke":
+              break;
+            case "redPacketStatus":
+              break;
+            case "online":
+              break;
+            case "discuss":
+              break;
+            default:
+              const wasAtBottom = this.isAtBottom();
+              this.messages.push(msg);
+              if (wasAtBottom) {
+                this.scrollToBottom();
+              } else {
+                this.unreadCount++;
+              }
               break;
           }
-          
-        })
+        });
       } catch (err) {
-        console.error('failed to load chat history', err);
+        console.error("failed to load chat history", err);
       }
     },
     async sendMessage() {
@@ -182,9 +250,9 @@ export async function mount(container: HTMLElement, fishpi: FishPi, full = false
       if (!msg) return;
       try {
         await fishpi.chatroom.send(msg);
-        this.newMessage = '';
+        this.newMessage = "";
       } catch (e) {
-        console.error('send error', e);
+        console.error("send error", e);
       }
     },
     minimize() {
@@ -208,34 +276,37 @@ export async function mount(container: HTMLElement, fishpi: FishPi, full = false
 
       const onMouseUp = () => {
         this.dragging = false;
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
         this.save(); // save position on drag end
       };
 
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp);
     },
     save() {
       const { pos, title, visible } = this;
-      localStorage.setItem('popupCRSetting', JSON.stringify({ pos, title, visible }));
+      localStorage.setItem(
+        "popupCRSetting",
+        JSON.stringify({ pos, title, visible }),
+      );
     },
     popupChat() {
-      const popup = window.open('/cr-popup', '_blank', 'width=400,height=600');
+      const popup = window.open("/cr-popup", "_blank", "width=400,height=600");
       setTimeout(() => {
         if (popup?.document) {
-          popup.document.addEventListener('DOMContentLoaded', () => {
-            popup.document.body.innerHTML = '';
+          popup.document.addEventListener("DOMContentLoaded", () => {
+            popup.document.body.innerHTML = "";
           });
         }
       }, 500);
-    }
+    },
   }));
 
-  const wrapper = document.createElement('div');
-  wrapper.id = 'popup-cr';
+  const wrapper = document.createElement("div");
+  wrapper.id = "popup-cr";
   wrapper.innerHTML = `
-    <div x-data="${componentName}" class="popup-cr-wrapper${ full ? ' fullscreen-popup' : ''}">
+    <div x-data="${componentName}" class="popup-cr-wrapper${full ? " fullscreen-popup" : ""}">
       <!-- Minimal bar when minimized -->
       <div x-show="!visible" class="chat-min-bar" @click="restore" x-transition>
         <span>💬</span>
@@ -265,11 +336,21 @@ export async function mount(container: HTMLElement, fishpi: FishPi, full = false
               <img class="avatar" :src="msg.userAvatarURL" />
               <div class="chat-message-main">
                 <span class="nickname" x-text="displayName"></span>
-                <span class="content vditor-reset ft__smaller " x-html="displayContent"></span>
+                <div class="content-wrapper">
+                  <span x-ref="content" class="content vditor-reset ft__smaller" 
+                        :class="{ 'expanded': expanded || msg.type === 'redPacket' }"
+                        x-html="displayContent"></span>
+                  <button class="expand-btn" x-show="showExpandBtn" 
+                          @click="toggle" x-text="expanded ? '收起' : '展开'"></button>
+                </div>
               </div>
               <div class="time" x-show="hover" x-transition.opacity.duration.200ms x-text="msg.time"></div>
             </div>
           </template>
+        </div>
+        <!-- New message notice -->
+        <div x-show="unreadCount > 0" class="new-message-notice" @click="scrollToBottom(false)" x-transition>
+          <span x-text="unreadCount"></span> 条新消息 <code>↓</code>
         </div>
         <div class="chat-input-container">
           <input type="text" x-model="newMessage" placeholder="说点什么" @keydown.enter.prevent="sendMessage" />

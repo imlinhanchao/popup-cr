@@ -192,6 +192,37 @@ body.popup-only #popup-cr {
 .chat-message .content {
   word-break: break-word;
   color: #24292f;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.chat-message .content.expanded {
+  -webkit-line-clamp: unset;
+  overflow: visible;
+  display: block;
+}
+
+.chat-message .content-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.expand-btn {
+  font-size: 12px;
+  color: #0969da;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 4px;
+}
+.expand-btn:hover {
+  text-decoration: underline;
 }
 
 .chat-message .content img {
@@ -263,10 +294,79 @@ body.popup-only #popup-cr {
   background: #e5c856;
 }
 
+.new-message-notice {
+  position: absolute;
+  bottom: 80px;
+  right: 20px;
+  background: #f0d463;
+  color: #24292f;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.new-message-notice:hover {
+  transform: translateY(-2px);
+  background: #e5c856;
+}
+
 .redpacket-msg {
   background: linear-gradient(135deg, #f78989 0%, #dd2828 100%);
   border: 1px solid #c21a1a;
   border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: visible;
+}
+
+.redpacket-msg:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(221, 40, 40, 0.3);
+}
+
+.rps-gestures {
+  position: absolute;
+  right: -40px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 10;
+}
+
+.rps-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+  padding: 4px;
+  overflow: hidden;
+}
+
+.rps-btn:hover {
+  transform: scale(1.1);
+}
+
+.rps-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
   color: #fff;
   margin-top: 4px;
   box-shadow: 0 4px 10px rgba(221, 40, 40, 0.15);
@@ -297,9 +397,9 @@ body.popup-only #popup-cr {
   flex-shrink: 0;
 }
 
-.hongbao__icon {
-  width: 20px;
-  height: 20px;
+.vditor-reset .hongbao-icon, .hongbao-icon {
+  width: 70px;
+  height: 40px;
   fill: #fff;
 }
 
