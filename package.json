@@ -6,8 +6,7 @@
     "dev": "concurrently \"npm run dev:tsdown\" \"npm run dev:http\"",
     "dev:tsdown": "tsdown --watch",
     "dev:http": "http-server --cors -p 5173 dist",
-    "build": "tsdown && node scripts/pack.mjs",
-    "build:raw": "tsdown"
+    "build": "tsdown"
   },
   "dependencies": {
     "alpinejs": "^3.12.3"
