@@ -250,7 +250,7 @@ export async function mount(
   const componentName = `popupCR`;
   // define a chat component that loads history on init
   Alpine.data(componentName, () => ({
-    visible: true,
+    visible: false,
     title: "聊天室",
     newMessage: "",
     messages: [] as IChatRoomMessage[],
