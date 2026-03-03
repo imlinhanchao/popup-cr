@@ -31,7 +31,7 @@ export function activate(window: Window, document: Document, fishpi: FishPi) {
         debugger;
         if (popup?.document) {
           popup.document.addEventListener('DOMContentLoaded', () => {
-            popup.document.body.innerHTML = '<h1>Loading...</h1>';
+            Array.from(popup.document.body.children).forEach(c => c.style.display = 'none');
           });
         }
       });

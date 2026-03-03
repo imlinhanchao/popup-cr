@@ -138,16 +138,16 @@ export async function mount(
         `;
         
         modal.querySelector(".close-btn")?.addEventListener("click", () => {
-          document.body.removeChild(modal);
+          document.getElementById('popup-cr').removeChild(modal);
         });
         
         modal.addEventListener("click", (e) => {
           if (e.target === modal) {
-            document.body.removeChild(modal);
+            document.getElementById('popup-cr').removeChild(modal);
           }
         });
 
-        document.body.appendChild(modal);
+        document.getElementById('popup-cr').appendChild(modal);
       });
     },
     get displayName() {
@@ -374,7 +374,7 @@ export async function mount(
       setTimeout(() => {
         if (popup?.document) {
           popup.document.addEventListener("DOMContentLoaded", () => {
-            popup.document.body.innerHTML = "";
+            Array.from(popup.document.body.children).forEach(c => c.style.display = 'none');
           });
         }
       }, 500);
