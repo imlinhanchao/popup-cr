@@ -216,6 +216,11 @@ body.popup-only #popup-cr {
     line-height: 1.5;
     position: relative;
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
 }
 
 .chat-message.is-me .content {

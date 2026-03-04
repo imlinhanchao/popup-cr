@@ -138,16 +138,16 @@ export async function mount(
         `;
         
         modal.querySelector(".close-btn")?.addEventListener("click", () => {
-          document.getElementById('popup-cr').removeChild(modal);
+          document.getElementById('popup-cr')!.removeChild(modal);
         });
         
         modal.addEventListener("click", (e) => {
           if (e.target === modal) {
-            document.getElementById('popup-cr').removeChild(modal);
+            document.getElementById('popup-cr')!.removeChild(modal);
           }
         });
 
-        document.getElementById('popup-cr').appendChild(modal);
+        document.getElementById('popup-cr')!.appendChild(modal);
       });
     },
     get displayName() {
@@ -261,7 +261,7 @@ export async function mount(
     isAtBottom() {
       const body = document.querySelector(".popup-cr-wrapper .chat-body");
       if (!body) return true;
-      return body.scrollHeight - body.scrollTop - body.clientHeight < 100;
+      return body.scrollHeight - body.scrollTop - body.clientHeight < 200;
     },
     async scrollToBottom(wait=true) {
       if(wait) await this.$nextTick()
@@ -329,6 +329,7 @@ export async function mount(
       try {
         await fishpi.chatroom.send(msg);
         this.newMessage = "";
+        this.scollToBottom();
       } catch (e) {
         console.error("send error", e);
       }
@@ -374,7 +375,7 @@ export async function mount(
       setTimeout(() => {
         if (popup?.document) {
           popup.document.addEventListener("DOMContentLoaded", () => {
-            Array.from(popup.document.body.children).forEach(c => c.style.display = 'none');
+            Array.from(popup.document.body.children).forEach((c: any) => c.style.display = 'none');
           });
         }
       }, 500);
