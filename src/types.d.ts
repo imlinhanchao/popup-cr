@@ -1,4 +1,4 @@
-declare module 'https://unpkg.com/vue@3/dist/vue.esm-browser.js' {
+declare module 'https://unpkg.com/vue@3/dist/vue.esm-browser.prod.js' {
   export interface Ref<T = any> {
     value: T;
   }

@@ -13,7 +13,7 @@ export default defineConfig([
     minify: true,
     treeshake: true,
     deps: {
-      neverBundle: ['https://unpkg.com/vue@3/dist/vue.esm-browser.js'],
+      neverBundle: ['https://unpkg.com/vue@3/dist/vue.esm-browser.prod.js'],
       onlyAllowBundle: false,
     },
   }, {
@@ -27,7 +27,7 @@ export default defineConfig([
     clean: false,
     treeshake: true,
     deps: {
-      neverBundle: ['https://unpkg.com/vue@3/dist/vue.esm-browser.js'],
+      neverBundle: ['https://unpkg.com/vue@3/dist/vue.esm-browser.prod.js'],
       onlyAllowBundle: false,
     },
   }

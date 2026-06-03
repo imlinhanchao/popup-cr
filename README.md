@@ -77,7 +77,7 @@ npm run build
 
 ```tsx
 // src/components/MyComponent.tsx
-import { ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
+import { ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.prod.js';
 
 interface MyComponentProps {
   title: string;
