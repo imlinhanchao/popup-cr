@@ -8,7 +8,7 @@ import type {
   IRedPacketInfo,
 } from "fishpi";
 // @ts-expect-error - Vue is imported from CDN at runtime
-import { ref, computed, onMounted, nextTick } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
+import { ref, computed, onMounted, nextTick, Transition, h } from '../vender';
 
 const redpacketType: Record<string, string> = {
   random: "拼手气红包",
@@ -182,44 +182,45 @@ export const ChatMessage = {
       }
     };
 
-    return {
-      hover,
-      expanded,
-      showExpandBtn,
-      contentEl,
-      toggle,
-      openRedPacket,
-      displayName,
-      isMe,
-      displayContent,
-      handleContentClick,
-      handleRPSClick,
-    };
-  },
-  template: `
-    <div>
-      <section v-if="msg.userName" class="chat-message"
-         :class="{ 'is-me': isMe }"
-         @mouseenter="hover=true" @mouseleave="hover=false">
-        <img class="avatar" :src="msg.userAvatarURL" />
-        <div class="chat-message-main">
-          <span class="nickname">{{ displayName }}</span>
-          <div class="content-wrapper">
-            <span ref="contentEl" class="content vditor-reset ft__smaller" 
-                  :class="{ 'expanded': expanded || msg.type === 'redPacket' }"
-                  v-html="displayContent"
-                  @click="handleContentClick"
-                  @openrp="handleRPSClick"></span>
-            <button class="expand-btn" v-if="showExpandBtn" 
-                    @click="toggle">{{ expanded ? '收起' : '展开' }}</button>
-          </div>
-        </div>
-        <Transition name="fade">
-          <div class="time" v-show="hover">{{ msg.time }}</div>
-        </Transition>
-      </section>
-      <section v-else v-html="displayContent" class="system-msg-wrapper">
-      </section>
-    </div>
-  `
+    // 返回 render 函数（使用 JSX）
+    return () => (
+      <div>
+        {props.msg.userName ? (
+          <section 
+            class={['chat-message', { 'is-me': isMe.value }]}
+            onMouseenter={() => hover.value = true}
+            onMouseleave={() => hover.value = false}
+          >
+            <img class="avatar" src={props.msg.userAvatarURL} />
+            <div class="chat-message-main">
+              <span class="nickname">{displayName.value}</span>
+              <div class="content-wrapper">
+                <span 
+                  ref={contentEl}
+                  class={['content', 'vditor-reset', 'ft__smaller', {
+                    'expanded': expanded.value || props.msg.type === 'redPacket'
+                  }]}
+                  innerHTML={displayContent.value}
+                  onClick={handleContentClick}
+                  onOpenrp={handleRPSClick}
+                ></span>
+                {showExpandBtn.value && (
+                  <button class="expand-btn" onClick={toggle}>
+                    {expanded.value ? '收起' : '展开'}
+                  </button>
+                )}
+              </div>
+            </div>
+            <Transition name="fade">
+              {hover.value && (
+                <div class="time">{props.msg.time}</div>
+              )}
+            </Transition>
+          </section>
+        ) : (
+          <section class="system-msg-wrapper" innerHTML={displayContent.value}></section>
+        )}
+      </div>
+    );
+  }
 };

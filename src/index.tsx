@@ -1,6 +1,6 @@
 import type { FishPi } from "fishpi";
 // @ts-expect-error - Vue is imported from CDN at runtime
-import { createApp } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
+import { createApp } from './vender';
 import { injectStyles } from "./styles";
 import { PopupApp } from "./components/PopupApp";
 

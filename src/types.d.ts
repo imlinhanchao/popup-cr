@@ -26,12 +26,19 @@ declare module 'https://unpkg.com/vue@3/dist/vue.esm-browser.js' {
   export function nextTick(fn?: () => void): Promise<void>;
   export function onMounted(hook: () => void): void;
   export function h(type: string | Component, props?: any, children?: any): any;
+  export const Transition: Component;
 }
 
 declare global {
   namespace JSX {
+    interface Element {
+      [key: string]: any;
+    }
     interface IntrinsicElements {
       [elemName: string]: any;
+    }
+    interface ElementChildrenAttribute {
+      children: {};
     }
   }
 }

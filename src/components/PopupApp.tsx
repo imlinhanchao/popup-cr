@@ -1,6 +1,6 @@
 import type { FishPi, IChatRoomMessage } from "fishpi";
 // @ts-expect-error - Vue is imported from CDN at runtime
-import { ref, reactive, computed, onMounted, nextTick } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
+import { ref, reactive, computed, onMounted, nextTick, Transition, h } from '../vender';
 import { ChatMessage } from './ChatMessage';
 
 interface PopupAppProps {
@@ -10,9 +10,6 @@ interface PopupAppProps {
 }
 
 export const PopupApp = {
-  components: {
-    ChatMessage
-  },
   props: ['info', 'fishpi', 'full'],
   setup(props: PopupAppProps) {
     const setting = JSON.parse(localStorage.getItem("popupCRSetting") || "{}");
@@ -62,13 +59,22 @@ export const PopupApp = {
       save();
     };
 
+    const handleMinBarClick = (e: MouseEvent) => {
+      // 只有在没有拖拽的情况下才恢复窗口
+      if (!dragging.value) {
+        restore();
+      }
+    };
+
     const startDrag = (e: MouseEvent) => {
-      dragging.value = true;
+      e.preventDefault();
       const startX = e.clientX - pos.x;
       const startY = e.clientY - pos.y;
+      let hasMoved = false;
 
       const onMouseMove = (moveEvent: MouseEvent) => {
-        if (!dragging.value) return;
+        hasMoved = true;
+        dragging.value = true;
         pos.x = moveEvent.clientX - startX;
         pos.y = moveEvent.clientY - startY;
       };
@@ -77,7 +83,9 @@ export const PopupApp = {
         dragging.value = false;
         document.removeEventListener("mousemove", onMouseMove);
         document.removeEventListener("mouseup", onMouseUp);
-        save();
+        if (hasMoved) {
+          save();
+        }
       };
 
       document.addEventListener("mousemove", onMouseMove);
@@ -153,63 +161,66 @@ export const PopupApp = {
       }
     });
 
-    return {
-      visible,
-      title,
-      newMessage,
-      messages,
-      unreadCount,
-      pos,
-      transformStyle,
-      sendMessage,
-      minimize,
-      restore,
-      startDrag,
-      scrollToBottom,
-      popupChat,
-    };
-  },
-  template: `
-    <div :class="['popup-cr-wrapper', { 'fullscreen-popup': full }]">
-      <Transition name="fade">
-        <div v-show="!visible" class="chat-min-bar" @click="restore">
-          <span>💬</span>
-          <span>{{ title }}</span>
-        </div>
-      </Transition>
-
-      <Transition name="slide">
-        <div v-show="visible" class="chat-window" :style="transformStyle">
-          <div class="chat-header" @mousedown="startDrag">
-            <span class="chat-header-title">
-              <span>💬</span>
-              <span style="vertical-align: middle;">{{ title }}</span>
-            </span>
-            <span>
-              <button class="popup-cr-close" @click="popupChat" title="弹窗">↗️</button>
-              <button class="popup-cr-close" @click="minimize" title="最小化">➖</button>
-            </span>
+    // 返回 render 函数（使用 JSX）
+    return () => (
+      <div class={['popup-cr-wrapper', { 'fullscreen-popup': props.full }]}>
+        {
+        !visible.value ? (
+          <div 
+            class="chat-min-bar" 
+            style={transformStyle.value}
+            onMousedown={startDrag}
+            onClick={handleMinBarClick}
+          >
+            <span>💬</span>
+            <span>{title.value}</span>
           </div>
-          <div class="chat-body">
-            <ChatMessage
-              v-for="msg in messages"
-              :key="msg.oId"
-              :msg="msg"
-              :info="info"
-              :fishpi="fishpi"
-            />
-          </div>
-          <Transition name="fade">
-            <div v-show="unreadCount > 0" class="new-message-notice" @click="scrollToBottom(false)">
-              <span>{{ unreadCount }}</span> 条新消息 <code>↓</code>
+          ) : (
+            <div class="chat-window" style={transformStyle.value}>
+              <div class="chat-header" onMousedown={startDrag}>
+                <span class="chat-header-title">
+                  <span>💬</span>
+                  <span style="vertical-align: middle;">{title.value}</span>
+                </span>
+                <span>
+                  <button class="popup-cr-close" onClick={popupChat} title="弹窗">↗️</button>
+                  <button class="popup-cr-close" onClick={minimize} title="最小化">➖</button>
+                </span>
+              </div>
+              <div class="chat-body">
+                {messages.value.map((msg: IChatRoomMessage) => 
+                  h(ChatMessage as any, {
+                    key: msg.oId,
+                    msg: msg,
+                    info: props.info,
+                    fishpi: props.fishpi
+                  })
+                )}
+              </div>
+              {unreadCount.value > 0 ? (
+                <div class="new-message-notice" onClick={() => scrollToBottom(false)}>
+                  <span>{unreadCount.value}</span> 条新消息 <code>↓</code>
+                </div>
+              ) : <span></span>}
+              <div class="chat-input-container">
+                <input 
+                  type="text" 
+                  value={newMessage.value}
+                  onInput={(e: any) => newMessage.value = e.target.value}
+                  placeholder="说点什么" 
+                  onKeydown={(e: KeyboardEvent) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      sendMessage();
+                    }
+                  }}
+                />
+                <button onClick={sendMessage}>发送</button>
+              </div>
             </div>
-          </Transition>
-          <div class="chat-input-container">
-            <input type="text" v-model="newMessage" placeholder="说点什么" @keydown.enter.prevent="sendMessage" />
-            <button @click="sendMessage">发送</button>
-          </div>
-        </div>
-      </Transition>
-    </div>
-  `
+          )
+        }
+      </div>
+    );
+  }
 };

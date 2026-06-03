@@ -5,16 +5,16 @@
 ## 技术栈
 
 - Vue 3 (从 CDN 导入)
-- TypeScript
+- TypeScript + TSX/JSX
 - tsdown (构建工具)
 
 ## 项目结构
 
 ```
 src/
-├── components/          # Vue 组件
-│   ├── ChatMessage.ts  # 聊天消息组件
-│   └── PopupApp.ts     # 主应用组件
+├── components/          # Vue 组件（TSX 格式）
+│   ├── ChatMessage.tsx # 聊天消息组件
+│   └── PopupApp.tsx    # 主应用组件
 ├── index.tsx           # 入口文件，导出 mount 函数
 ├── styles.ts           # 样式定义
 └── types.d.ts          # TypeScript 类型声明
@@ -69,23 +69,32 @@ npm run build
 
 要添加新的 Vue 组件，只需：
 
-1. 在 `src/components/` 目录创建新的 `.ts` 文件
-2. 导出组件对象（包含 `setup` 和 `template`）
+1. 在 `src/components/` 目录创建新的 `.tsx` 文件
+2. 导出组件对象（从 setup 返回 JSX render 函数）
 3. 在需要使用的组件中导入
 
 示例：
 
-```typescript
-// src/components/MyComponent.ts
+```tsx
+// src/components/MyComponent.tsx
 import { ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
 
+interface MyComponentProps {
+  title: string;
+}
+
 export const MyComponent = {
-  props: ['someProp'],
-  setup(props) {
+  props: ['title'],
+  setup(props: MyComponentProps) {
     const count = ref(0);
-    return { count };
-  },
-  template: `<div>{{ count }}</div>`
+    
+    return () => (
+      <div>
+        <h2>{props.title}</h2>
+        <p>Count: {count.value}</p>
+        <button onClick={() => count.value++}>Increment</button>
+      </div>
+    );
+  }
 };
 ```
-
