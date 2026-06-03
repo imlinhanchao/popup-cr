@@ -1,5 +1,4 @@
 import type { FishPi, IChatRoomMessage } from "fishpi";
-// @ts-expect-error - Vue is imported from CDN at runtime
 import { ref, reactive, computed, onMounted, nextTick, Transition, h } from '../vender';
 import { ChatMessage } from './ChatMessage';
 
@@ -125,7 +124,7 @@ export const PopupApp = {
                 type,
                 userName: '',
                 content: msg,
-              });
+              } as any);
               break;
             case "barrager":
               messages.value.push({
@@ -135,7 +134,7 @@ export const PopupApp = {
                 userNickname: msg.userNickname,
                 userAvatarURL: msg.userAvatarURL,
                 content: msg,
-              });
+              } as any);
               break;
             case "revoke":
               const index = messages.value.findIndex((m: IChatRoomMessage) => m.oId === msg);

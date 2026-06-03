@@ -7,7 +7,6 @@ import type {
   FishPi,
   IRedPacketInfo,
 } from "fishpi";
-// @ts-expect-error - Vue is imported from CDN at runtime
 import { ref, computed, onMounted, nextTick, Transition, h } from '../vender';
 
 const redpacketType: Record<string, string> = {
@@ -211,11 +210,9 @@ export const ChatMessage = {
                 )}
               </div>
             </div>
-            <Transition name="fade">
-              {hover.value && (
-                <div class="time">{props.msg.time}</div>
-              )}
-            </Transition>
+            {h(Transition as any, { name: "fade" }, () => 
+              hover.value ? <div class="time">{props.msg.time}</div> : null
+            )}
           </section>
         ) : (
           <section class="system-msg-wrapper" innerHTML={displayContent.value}></section>
