@@ -8,7 +8,10 @@
     "jsxFactory": "h",
     "jsxFragmentFactory": "Fragment",
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "./components/*": ["./src/components/*"]
+    }
   },
-  "include": ["index.ts", "src/**/*"]
+  "include": ["index.ts", "src/**/*", "module.ts"]
 }

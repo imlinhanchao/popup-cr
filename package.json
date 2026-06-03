@@ -1,18 +1,14 @@
 {
   "name": "popup-cr",
   "version": "1.0.0",
-  "description": "A popup UI component for Tampermonkey scripts, built with Alpine.js and tsdown",
+  "description": "A popup UI component for Tampermonkey scripts, built with Vue 3 and tsdown",
   "scripts": {
     "dev": "concurrently \"npm run dev:tsdown\" \"npm run dev:http\"",
     "dev:tsdown": "tsdown --watch",
     "dev:http": "http-server --cors -p 5173 dist",
     "build": "tsdown"
   },
-  "dependencies": {
-    "alpinejs": "^3.12.3"
-  },
   "devDependencies": {
-    "@types/alpinejs": "^3.13.11",
     "concurrently": "^9.2.1",
     "fishpi": "^0.1.26",
     "http-proxy": "^1.18.1",

@@ -3,13 +3,16 @@ import { defineConfig } from 'tsdown';
 export default defineConfig([
   {
     entry: 'index.ts',
-    format: 'iife',
+    format: 'esm',
     platform: 'browser',
     outDir: 'dist',
+    dts: false,
+    target: 'esnext',
+    sourcemap: false,
     clean: true,
     minify: true,
+    treeshake: true,
     deps: {
-      alwaysBundle: ['alpinejs'],
       onlyAllowBundle: false,
     },
   }, {
@@ -23,7 +26,7 @@ export default defineConfig([
     clean: false,
     treeshake: true,
     deps: {
-      alwaysBundle: ['alpinejs'],
+      neverBundle: ['https://unpkg.com/vue@3/dist/vue.esm-browser.js'],
       onlyAllowBundle: false,
     },
   }

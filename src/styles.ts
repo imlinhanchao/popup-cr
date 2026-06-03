@@ -638,6 +638,60 @@ body.popup-only #popup-cr {
   text-align: center;
   display: block;
 }
+
+/* Vue Transition Styles */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+
+.slide-enter-active, .slide-leave-active {
+  transition: all 0.3s ease;
+}
+
+.slide-enter-from {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+}
+
+.slide-leave-to {
+  opacity: 0;
+  transform: translateY(-20px) scale(0.95);
+}
+
+/* Existing Alpine transition classes for backward compatibility */
+.chat-transition-enter {
+  animation: slideIn 0.3s ease;
+}
+
+.chat-transition-leave {
+  animation: slideOut 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+}
 `;
 
 let stylesInjected = false;
